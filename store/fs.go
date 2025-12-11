@@ -29,7 +29,13 @@ func (f *FileSystemStorageProvider) Download(fileCollection string, file rocketc
 	sourcePath := f.Location + "/" + file.ID
 
 	if file.Extension != "" {
-		sourcePath = sourcePath + "." + file.Extension
+		pathWithExt := sourcePath + "." + file.Extension
+		// Try with extension first
+		if _, err := os.Stat(pathWithExt); err == nil {
+			sourcePath = pathWithExt
+		}
+		// If file with extension doesn't exist, try without extension
+		// (falls through to use original sourcePath)
 	}
 
 	destinationPath := f.TempFileLocation + "/" + file.ID
